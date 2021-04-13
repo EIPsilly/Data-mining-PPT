@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="initial-scale=1.0, user-scalable=1.0">
+  <title>optics</title>
+  <script src="{{ url_for('static',filename='js/jquery-3.4.1.js' )}}"></script>
+  <script src="{{ url_for('static',filename='js/bootstrap.js' )}}"></script>
+  <script src="{{ url_for('static',filename='js/d3.v5.js')}}"></script>
+  <link rel="stylesheet" href="{{ url_for('static',filename='css/bootstrap.css')}}">
+  <link rel="stylesheet" href="{{ url_for('static',filename='css/index.css')}}">
+</head>
+
+<body>
+  <div id="Panel">
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th>变量名称</th>
+          <th>值</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>e</td>
+          <td id = "e"></td>
+        </tr>
+        <tr>
+          <td>MinPts</td>
+          <td id = "MinPts"></td>
+        </tr>
+        <tr>
+          <td>num</td>
+          <td id = "num"></td>
+        </tr>
+        <tr>
+          <td>pi出序数组</td>
+          <td id = "pi"></td>
+        </tr>
+        <tr>
+          <td>seedlist</td>
+          <td id = "seedlist"></td>
+        </tr>
+      </tbody>
+    </table>
+    <table class="table table-bordered">
+      <caption>Points</caption>
+      <thead>
+        <tr>
+          <th>序号</th>
+          <th>x</th>
+          <th>y</th>
+          <th>核心距离</th>
+          <th>可达距离</th>
+          <th>是否被处理过</th>
+          <th>邻域内的点</th>
+        </tr>
+      </thead>
+      <tbody id="PointsTable">
+        <tr>
+          <td>0</td>
+          <td></td>
+          <td>y</td>
+          <td>核心距离</td>
+          <td>可达距离</td>
+          <td>是否被处理过</td>
+          <td>邻域内的点</td>
+        </tr>
+      </tbody>
+    </table>
+    <!-- <table class="table table-bordered" id = "distance">
+    </table> -->
+    <button class="btn btn-default" onclick="ControlECircle()">显示邻域</button>
+    <button class="btn btn-default" onclick="AddToNeighborhood()">邻域内的点</button>
+    <button class="btn btn-default" onclick="CalcCoreDistance()">计算核心距离</button>
+    <button class="btn btn-default" onclick="GetNextNode()">选择下一个点</button>
+    <button class="btn btn-default" onclick="insertlist()">添加点到seedlist</button>
+    <p id= "neighborhood" style="font-size: 18px;">点<span id = "neighborhood_id"> </span>邻域内的点<span id = "neighborhoods"> </span></p>
+  </div>
+  <svg id="Paint"></svg>
+  <script src="{{ url_for('static',filename='js/index.js')}}"></script>
+</body>
+
+</html>
