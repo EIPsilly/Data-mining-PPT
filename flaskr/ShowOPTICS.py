@@ -13,8 +13,8 @@ bp = Blueprint('ShowOPTICS',__name__)
 
 @bp.route('/')
 def index():
-    # Demo = myOPTICS.CreateWithPoints(3.2,2,[[1,2],[2,5],[3,6],[8,7],[8,8],[7,3]])
-    Demo = myOPTICS.CreateWithPoints(3,3,[[2, 0], [6, 4], [0, 1], [4, 1], [5, 5], [4, 3], [5, 6], [9, 8], [7, 5], [1, 9], [8, 7], [5, 9], [9, 2], [3, 7], [4, 4]])
+    # Demo = myOPTICS.CreateWithPoints(4,2,[[1,2],[2,5],[3,6],[8,7],[8,8],[7,3]])
+    Demo = myOPTICS.CreateWithPoints(2.5,3,[[2, 0], [6, 4], [0, 1], [4, 1], [5, 5], [4, 3], [5, 6], [9, 8], [7, 5], [1, 9], [8, 7], [5, 9], [9, 2], [3, 7], [4, 4]])
     session["Demo"] = json.dumps(Demo,cls=OpticsEncoder)
     return render_template('index.html')
 
@@ -42,6 +42,35 @@ def CalcCoreDistance():
     session["Demo"] = json.dumps(Demo,cls=OpticsEncoder)
     return session["Demo"]
 
+def SetSelectedNode(Demo,node,index):
+    node.vi = 1  # 设置为已处理过
+    Demo.remainder -= 1
+    Demo.pi.append(index)  # 添加到出序队列
+    session["Demo"] = json.dumps(Demo,cls=OpticsEncoder)
+
+    print("len(node.N)")
+    print(len(node.N))
+    print("index")
+    print(index)
+    # 选出的点是核心点
+    if (len(node.N) >= Demo.MinPts):
+        return {
+            "index":index,
+            "Demo":json.loads(session["Demo"]),
+            "seedlist":getseedlist(Demo.seedlist),
+            "insertlist":True
+        }
+
+    print("Demo.seedlist.queue")
+    print(Demo.seedlist.queue)
+    # 选出的点不是核心点
+    return {
+        "index":index,
+        "Demo":json.loads(session["Demo"]),
+        "insertlist":False,
+        "seedlist":getseedlist(Demo.seedlist)
+    }
+
 @bp.route("/GetStartNode")
 def GetStartNode():
     Demo = myOPTICS.CreateWithJson(json.loads(session["Demo"]))
@@ -59,14 +88,7 @@ def GetStartNode():
     while (Demo.remainder > 0) & (node.vi != -1):
         Demo.ptr = (Demo.ptr + 1) % Demo.num
         node = Demo.points[Demo.ptr]
-    node.vi = 1  # 设置为已处理过
-    Demo.remainder -= 1
-    Demo.pi.append(Demo.ptr)  # 添加到出序队列
-    session["Demo"] = json.dumps(Demo,cls=OpticsEncoder)
-    return {
-        "index":Demo.ptr,
-        "Demo":json.loads(session["Demo"])
-    }
+    return SetSelectedNode(Demo,node,Demo.ptr)
 
 from queue import PriorityQueue as PQ
 def getseedlist(seedlist):
@@ -127,16 +149,7 @@ def GetNodeFromSeedlist():
     Demo = myOPTICS.CreateWithJson(json.loads(session["Demo"]))
     while Demo.seedlist._qsize() > 0:
         index2 = Demo.seedlist._get()[1]
-        item = Demo.points[index2]
-        if item.vi != -1:
+        node = Demo.points[index2]
+        if node.vi != -1:
             continue
-        item.vi = 1
-        Demo.remainder -= 1
-        Demo.pi.append(index2)
-
-        session["Demo"] = json.dumps(Demo,cls=OpticsEncoder)
-        return {
-            "index":index2,
-            "Demo":json.loads(session["Demo"]),
-            "seedlist":getseedlist(Demo.seedlist)
-        }
+        return SetSelectedNode(Demo,node,index2)
